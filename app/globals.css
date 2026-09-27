@@ -1,0 +1,324 @@
+@import "tailwindcss";
+
+/* Tell Tailwind v4 exactly which files to scan for class names.
+   Without this, automatic source detection can miss files and silently drop
+   responsive variants (emitting e.g. `sm:flex-row` with no media query),
+   which breaks every breakpoint. */
+@source "../app";
+@source "../components";
+@source "../lib";
+
+/* Breakpoints — declared explicitly so the generated media queries are
+   guaranteed to exist rather than relying on defaults being inferred. */
+@theme {
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+}
+
+
+/* ============================================================
+   DimensionUI — Design Tokens
+   Deep obsidian space system with neon purple / electric cyan
+   ============================================================ */
+
+@theme {
+  /* ---- Surfaces ---- */
+  --color-obsidian: #07070d;
+  --color-surface: #0e0e1a;
+  --color-surface-2: #13131f;
+  --color-surface-3: #181826;
+
+  /* ---- Borders ---- */
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.14);
+
+  /* ---- Neon accents ---- */
+  --color-neon-purple: #8b5cf6;
+  --color-neon-purple-bright: #a78bfa;
+  --color-neon-purple-deep: #6d28d9;
+  --color-electric-cyan: #06b6d4;
+  --color-electric-cyan-bright: #22d3ee;
+  --color-electric-cyan-deep: #0e7490;
+
+  /* ---- Typography ---- */
+  --color-ink: #e2e8f0;
+  --color-ink-dim: #94a3b8;
+  --color-ink-faint: #64748b;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* ---- Motion ---- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- Custom animations ---- */
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+  --animate-float-slow: float-slow 7s ease-in-out infinite;
+  --animate-shimmer: shimmer 3.5s linear infinite;
+  --animate-rise: rise 0.7s var(--ease-out-expo) both;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -160% 0;
+  }
+  100% {
+    background-position: 260% 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+
+@layer base {
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Offset for the sticky navbar when jumping to anchors */
+    scroll-padding-top: 6.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-obsidian);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.011em;
+    overflow-x: hidden;
+  }
+
+  /* Crisp display type: tighter tracking as size grows */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-neon-purple) 42%, transparent);
+    color: #fff;
+  }
+
+  /* Sleek obsidian scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-obsidian);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #23233a;
+    border-radius: 99px;
+    border: 2px solid var(--color-obsidian);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #33334f;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-neon-purple-bright);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+
+@utility glass {
+  /* The translucent white gradient supplies the sheen, but a near-opaque
+     obsidian base is what actually guarantees legibility: backdrop-filter
+     alone does not darken anything, so over bright content a purely
+     transparent glass panel lets text bleed through. */
+  background-color: rgba(14, 14, 26, 0.82);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid var(--color-hairline);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+}
+
+/* Denser variant for panels that overlay busy content (mobile nav sheet). */
+@utility glass-solid {
+  background-color: rgba(10, 10, 18, 0.94);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  border: 1px solid var(--color-hairline);
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+}
+
+@utility card-surface {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+}
+
+/* Text gradient — purple → light → cyan */
+@utility text-gradient-neon {
+  background-image: linear-gradient(
+    100deg,
+    #a78bfa 0%,
+    #c4b5fd 26%,
+    #e2e8f0 52%,
+    #22d3ee 82%,
+    #06b6d4 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility text-gradient-brand {
+  background-image: linear-gradient(120deg, #a78bfa 0%, #8b5cf6 45%, #06b6d4 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ambient radial glow blobs */
+@utility glow-purple {
+  background: radial-gradient(
+    circle at center,
+    rgba(139, 92, 246, 0.5) 0%,
+    rgba(139, 92, 246, 0.16) 38%,
+    transparent 70%
+  );
+}
+
+@utility glow-cyan {
+  background: radial-gradient(
+    circle at center,
+    rgba(6, 182, 212, 0.42) 0%,
+    rgba(6, 182, 212, 0.13) 38%,
+    transparent 70%
+  );
+}
+
+/* Dot-grid atmosphere */
+@utility bg-dot-grid {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.085) 1px,
+    transparent 1px
+  );
+  background-size: 26px 26px;
+}
+
+@utility bg-dot-grid-fine {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px
+  );
+  background-size: 14px 14px;
+}
+
+/* Fades the dot grid out toward the edges */
+@utility mask-radial-fade {
+  mask-image: radial-gradient(
+    ellipse 78% 62% at 50% 38%,
+    #000 12%,
+    rgba(0, 0, 0, 0.55) 52%,
+    transparent 88%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 78% 62% at 50% 38%,
+    #000 12%,
+    rgba(0, 0, 0, 0.55) 52%,
+    transparent 88%
+  );
+}
+
+/* Animated shimmering sweep across surfaces */
+@utility shimmer-sweep {
+  background-image: linear-gradient(
+    100deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.16) 48%,
+    transparent 64%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Thin luminous top edge on cards */
+@utility edge-highlight {
+  position: relative;
+}
+
+@utility prevent-layout-shift {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
