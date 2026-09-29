@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/dashboard/', '/login/'],
+        disallow: ['/dashboard/', '/login/', '/preview/'],
       },
     ],
     sitemap: 'https://dimensionui.com/sitemap.xml',

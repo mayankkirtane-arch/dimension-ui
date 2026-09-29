@@ -8,10 +8,12 @@
  */
 import { useState } from "react";
 import { useCartStore, getCartTotals } from "@/lib/store";
-import { CHECKOUT_URL } from "@/lib/site";
+import type { TemplateItem } from "@/lib/site";
+import { CHECKOUT_URL, TEMPLATES } from "@/lib/site";
 import { validateCoupon } from "@/lib/coupons";
 import { X, ShoppingCart, Trash2, Tag, Zap, Ticket, CheckCircle, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PayPalCheckoutModal } from "@/components/paypal-checkout-modal";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, clearCart } = useCartStore();
@@ -22,6 +24,7 @@ export function CartDrawer() {
   const [couponLabel, setCouponLabel] = useState("");
   const [couponError, setCouponError] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
+  const [paypalTemplate, setPaypalTemplate] = useState<TemplateItem | null>(null);
 
   const couponSavings = (subtotal - discount) * (couponDiscount / 100);
   const finalTotal = Math.max(0, total - couponSavings);
@@ -241,6 +244,19 @@ export function CartDrawer() {
                   </div>
                 </div>
 
+                {paidItems.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const fullTemplate = TEMPLATES.find((t) => t.id === paidItems[0].id);
+                      if (fullTemplate) setPaypalTemplate(fullTemplate);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#ffc439] hover:bg-[#f4b628] py-3 text-sm font-bold text-[#003087] shadow-lg transition-all"
+                  >
+                    <span className="italic font-black text-sm">PayPal</span>
+                    <span>Sandbox Checkout ({paidItems[0].name})</span>
+                  </button>
+                )}
+
                 <button
                   onClick={handleCheckout}
                   className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 py-3.5 text-sm font-bold text-white shadow-lg hover:brightness-110 transition-all"
@@ -259,6 +275,18 @@ export function CartDrawer() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {paypalTemplate && (
+        <PayPalCheckoutModal
+          template={paypalTemplate}
+          isOpen={!!paypalTemplate}
+          onClose={() => setPaypalTemplate(null)}
+          onSuccess={() => {
+            removeItem(paypalTemplate.id);
+            setPaypalTemplate(null);
+          }}
+        />
+      )}
     </>
   );
 }

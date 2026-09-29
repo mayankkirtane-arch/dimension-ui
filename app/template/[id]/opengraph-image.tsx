@@ -12,9 +12,10 @@ export const contentType = "image/png";
 export default async function TemplateOGImage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }> | { id: string };
 }) {
-  const { id } = await params;
+  const resolvedParams = await Promise.resolve(params);
+  const id = resolvedParams?.id;
   const template = TEMPLATES.find((t) => t.id === id);
 
   const name = template?.name ?? "DimensionUI Template";
@@ -24,7 +25,7 @@ export default async function TemplateOGImage({
   const tier = template?.tier ?? "free";
 
   const tierColor =
-    tier === "30" ? "#a855f7" : tier === "20" ? "#c084fc" : tier === "15" ? "#22d3ee" : "#34d399";
+    tier === "20" ? "#c084fc" : tier === "15" ? "#22d3ee" : "#34d399";
 
   return new ImageResponse(
     (

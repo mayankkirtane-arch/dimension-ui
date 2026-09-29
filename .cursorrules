@@ -1,0 +1,20 @@
+# DimensionUI Cursor Rules
+
+## Architecture & Conventions
+- Stack: Next.js 15.1.6 App Router, React 19, TypeScript strict mode, Tailwind CSS v4, Framer Motion.
+- All user-facing strings, navigation anchors, and template data MUST reside in `lib/site.ts`. Never hardcode copy inside UI components.
+- Class composition uses `cn()` from `lib/cn.ts` (dependency-free; do not introduce clsx or tw-merge).
+
+## Styling & Tailwind v4 Guardrails
+- Tailwind v4 uses CSS-first configuration: tokens live in `@theme` in `app/globals.css`. Custom utilities are authored with `@utility`. Do NOT create `tailwind.config.js`.
+- Always use the defined design tokens: `--color-obsidian` (`#07070d`), `--color-surface` (`#0e0e1a`), `--color-neon-purple` (`#8b5cf6`), `--color-electric-cyan` (`#06b6d4`), and hairline borders `rgba(255,255,255,0.08)`.
+- Never let a reusable component hard-code `display` classes (e.g. `inline-flex`) that could override responsive visibility (`hidden lg:flex`).
+
+## Truth-in-Advertising Rules
+- Never fabricate 100/100 performance scores. Real Lighthouse audit data is stored in `lib/verified-quality-data.json`.
+- Never mark a template "Figma Included" without a verified `figmaUrl`. Templates without Figma must show "No Figma File (Code-First)".
+- Payment integrations throughout DimensionUI use PayPal rather than Stripe.
+
+## Registry & Security
+- Public/free templates are accessible openly. Commercial templates require license authorization.
+- Never output or expose Supabase service role keys, secrets, or server environment variables.

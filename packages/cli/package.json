@@ -1,0 +1,30 @@
+{
+  "name": "dimensionui",
+  "version": "1.0.0",
+  "description": "Official CLI for DimensionUI — discover, inspect, and install templates, blocks, and design components from the DimensionUI registry.",
+  "bin": {
+    "dimensionui": "./bin/index.js",
+    "dim": "./bin/index.js"
+  },
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node ./bin/index.js",
+    "test": "node ../../scripts/test-cli.js"
+  },
+  "keywords": [
+    "dimensionui",
+    "cli",
+    "registry",
+    "nextjs",
+    "react",
+    "tailwind",
+    "framer-motion",
+    "templates",
+    "components"
+  ],
+  "author": "DimensionUI Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

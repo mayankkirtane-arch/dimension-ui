@@ -74,7 +74,7 @@ export function TemplateRequestModal() {
                   <CheckCircle className="size-12 text-emerald-400 mb-3" />
                   <h3 className="text-xl font-bold text-white">Request Received!</h3>
                   <p className="mt-1 text-sm text-white/60">
-                    We'll review your template idea and notify you at <strong className="text-white">{email}</strong> as soon as it's built.
+                    We&apos;ll review your template idea and notify you at <strong className="text-white">{email}</strong> as soon as it&apos;s built.
                   </p>
                 </div>
               ) : (
@@ -83,7 +83,7 @@ export function TemplateRequestModal() {
                     <span className="text-xs font-semibold text-purple-400 uppercase tracking-wider">Community Wishlist</span>
                     <h3 className="text-xl font-bold text-white mt-1">Request a Website Template</h3>
                     <p className="text-xs text-white/50 mt-1">
-                      Need a specific niche or 3D feature we don't have yet? Tell us and we'll build it.
+                      Need a specific niche or 3D feature we don&apos;t have yet? Tell us and we&apos;ll build it.
                     </p>
                   </div>
 

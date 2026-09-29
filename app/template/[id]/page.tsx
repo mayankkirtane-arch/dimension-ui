@@ -3,20 +3,42 @@
  * Generates a unique, indexable page at /template/[id] for every template in the TEMPLATES array.
  * Next.js will statically generate all 42 pages at build time.
  */
-import { TEMPLATES, CHECKOUT_URL } from "@/lib/site";
+import {
+  TEMPLATES,
+  CHECKOUT_URL,
+  getTemplateVersion,
+  getTemplateLastUpdated,
+  getTemplateChangelog,
+  getTemplateCompatibility,
+  getTemplateQualityReport,
+  getTemplateIntegrations,
+  getTemplateFigma,
+} from "@/lib/site";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Check, ShoppingCart, Zap, ExternalLink } from "lucide-react";
+import { ArrowLeft, Check, ShoppingCart, Zap, ExternalLink, Sliders, GitCommit, ShieldCheck, Blocks, Figma } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { ReviewsSection } from "@/components/reviews";
+import { TemplateChangelog } from "@/components/template-changelog";
+import { TemplateCompatibility } from "@/components/template-compatibility";
+import { TemplateQualityBadges } from "@/components/template-quality-badges";
+import { TemplateIntegrations } from "@/components/template-integrations";
+import { TemplateFigmaSection } from "@/components/template-figma";
+import {
+  getTemplateSeo,
+  getTemplateSeoTitle,
+  getTemplateSeoDescription,
+  getTemplateSeoKeywords,
+} from "@/lib/seo-intent";
+import { getBlogPostBySlug } from "@/lib/site";
 
 // Generate all static paths at build time
 export async function generateStaticParams() {
   return TEMPLATES.map((t) => ({ id: t.id }));
 }
 
-// Generate unique meta tags per template for SEO
+// Generate unique meta tags per template targeting distinct international search intent
 export async function generateMetadata({
   params,
 }: {
@@ -25,25 +47,15 @@ export async function generateMetadata({
   const { id } = await params;
   const template = TEMPLATES.find((t) => t.id === id);
   if (!template) return {};
-  const isFree = template.tier === 'free';
-  const priceStr = isFree ? 'Free download' : `${template.price} one-time payment`;
-  const title = `${template.name} — Next.js Template`;
-  const description = `${template.blurb} Built with Next.js 15, Tailwind CSS & Framer Motion. ${priceStr}. Commercial license included.`;
+
+  const title = getTemplateSeoTitle(template);
+  const description = getTemplateSeoDescription(template);
+  const keywords = getTemplateSeoKeywords(template);
 
   return {
     title,
     description,
-    keywords: [
-      template.name,
-      `${template.category} template`,
-      `${template.category} Next.js template`,
-      "Next.js template",
-      "Tailwind CSS template",
-      "Framer Motion template",
-      "React template",
-      "buy website template",
-      "DimensionUI",
-    ],
+    keywords,
     openGraph: {
       title,
       description,
@@ -71,14 +83,28 @@ export default async function TemplatePage({
   if (!template) notFound();
 
   const isFree = template.tier === "free";
-  const is3D = template.tier === "30";
 
   const tierLabel = isFree ? "Free" : `$${template.tier} Tier`;
   const tierColor = isFree
     ? "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
-    : is3D
+    : template.tier === "20"
     ? "text-purple-300 border-purple-400/30 bg-purple-400/10"
     : "text-cyan-400 border-cyan-400/30 bg-cyan-400/10";
+
+  const currentVersion = getTemplateVersion(template);
+  const lastUpdated = getTemplateLastUpdated(template);
+  const changelogEntries = getTemplateChangelog(template);
+  const compatibility = getTemplateCompatibility(template);
+  const qualityReport = getTemplateQualityReport(template.id);
+  const integrations = getTemplateIntegrations(template);
+  const figma = getTemplateFigma(template);
+  const hasFigmaIncluded = figma.state === "Figma Included";
+  const hasFigmaAvailable = figma.state === "Figma Available";
+
+  const seoData = getTemplateSeo(template);
+  const relatedGuides = seoData.relatedBlogSlugs
+    .map((slug) => getBlogPostBySlug(slug))
+    .filter((b): b is NonNullable<typeof b> => Boolean(b));
 
   return (
     <div className="min-h-screen bg-[#06060b] text-white">
@@ -102,6 +128,42 @@ export default async function TemplatePage({
             },
             url: `https://dimensionui.com/template/${template.id}`,
             category: template.category,
+          }),
+        }}
+      />
+      {/* JSON-LD Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://dimensionui.com",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Templates",
+                item: "https://dimensionui.com/#gallery",
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: template.category,
+                item: `https://dimensionui.com/?category=${encodeURIComponent(template.category)}#gallery`,
+              },
+              {
+                "@type": "ListItem",
+                position: 4,
+                name: template.name,
+                item: `https://dimensionui.com/template/${template.id}`,
+              },
+            ],
           }),
         }}
       />
@@ -162,12 +224,18 @@ export default async function TemplatePage({
 
           {/* RIGHT: Info & CTA */}
           <div className="flex flex-col gap-6">
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs text-white/40">
+            {/* Breadcrumb Navigation */}
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs text-white/40">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span>/</span>
               <Link href="/#gallery" className="hover:text-white transition-colors">Templates</Link>
               <span>/</span>
-              <span>{template.category}</span>
-            </div>
+              <Link href={`/?category=${encodeURIComponent(template.category)}#gallery`} className="hover:text-white transition-colors">
+                {template.category}
+              </Link>
+              <span>/</span>
+              <span className="text-white/80 font-medium" aria-current="page">{template.name}</span>
+            </nav>
 
             {/* Title + tier badge */}
             <div>
@@ -178,6 +246,71 @@ export default async function TemplatePage({
                 <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-0.5 text-xs text-white/50">
                   {template.category}
                 </span>
+                <span className="rounded-full border border-purple-500/30 bg-purple-500/10 px-2.5 py-0.5 text-xs font-mono font-semibold text-purple-300">
+                  {currentVersion}
+                </span>
+                <a
+                  href="#compatibility"
+                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+                >
+                  <Sliders className="size-3 text-purple-400" />
+                  Compatibility
+                </a>
+                <a
+                  href="#integrations"
+                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+                >
+                  <Blocks className="size-3 text-cyan-400" />
+                  Integrations
+                  {integrations.length > 0 && (
+                    <span className="ml-0.5 text-[0.65rem] text-cyan-300 font-mono">({integrations.length})</span>
+                  )}
+                </a>
+                <a
+                  href="#quality"
+                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+                >
+                  <ShieldCheck className="size-3 text-emerald-400" />
+                  Quality Verified
+                </a>
+                <a
+                  href="#changelog"
+                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+                >
+                  <GitCommit className="size-3 text-cyan-400" />
+                  Changelog
+                </a>
+                {/* Figma Badge: ONLY "Figma Included" when resource actually exists */}
+                {hasFigmaIncluded && (
+                  <a
+                    href="#figma"
+                    className="inline-flex items-center gap-1 rounded-full border border-violet-500/40 bg-violet-500/15 px-2.5 py-0.5 text-xs font-semibold text-violet-300 hover:bg-violet-500/25 transition-colors shadow-[0_0_10px_rgba(139,92,246,0.2)]"
+                    title="Official Figma source file included"
+                  >
+                    <Figma className="size-3 text-violet-400" />
+                    Figma Included
+                  </a>
+                )}
+                {hasFigmaAvailable && (
+                  <a
+                    href="#figma"
+                    className="inline-flex items-center gap-1 rounded-full border border-cyan-500/40 bg-cyan-500/15 px-2.5 py-0.5 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/25 transition-colors"
+                    title="Figma community resource available"
+                  >
+                    <Figma className="size-3 text-cyan-400" />
+                    Figma Available
+                  </a>
+                )}
+                {!hasFigmaIncluded && !hasFigmaAvailable && (
+                  <a
+                    href="#figma"
+                    className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+                    title="Design specifications & code-first architecture"
+                  >
+                    <Figma className="size-3 text-white/40" />
+                    Figma (None)
+                  </a>
+                )}
               </div>
               <h1 className="text-4xl font-black text-white leading-tight">{template.name}</h1>
               <p className="mt-3 text-lg text-white/60 leading-relaxed">{template.blurb}</p>
@@ -185,7 +318,7 @@ export default async function TemplatePage({
 
             {/* Features */}
             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-              <p className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">What's included</p>
+              <p className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">What&apos;s included</p>
               <ul className="flex flex-col gap-2.5">
                 {template.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-white/80">
@@ -235,6 +368,175 @@ export default async function TemplatePage({
           </div>
         </div>
 
+        {/* Technical Specifications */}
+        <section className="mt-16 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                <Sliders className="size-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Technical Specifications</h2>
+                <p className="text-xs text-white/50">Verified architecture, framework stack, and licensing</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${tierColor}`}>
+                {tierLabel}
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/60">
+                {template.category}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Price</span>
+              <span className="text-base font-bold text-white mt-1.5">{isFree ? "Free ($0)" : template.price}</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">License</span>
+              <span className="text-base font-semibold text-white mt-1.5">Commercial (Unlimited Projects)</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Framework</span>
+              <span className="text-base font-semibold text-white mt-1.5">Next.js (App Router)</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Next.js version</span>
+              <span className="text-base font-semibold text-white mt-1.5">15.1.6</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">React version</span>
+              <span className="text-base font-semibold text-white mt-1.5">19.0.0</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Tailwind version</span>
+              <span className="text-base font-semibold text-white mt-1.5">4.0.0</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">TypeScript</span>
+              <span className="text-base font-semibold text-white mt-1.5">Strict (v5.7.3)</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Dark mode</span>
+              <span className="text-base font-semibold text-white mt-1.5">
+                {template.features.some((f) => f.toLowerCase().includes("dark"))
+                  ? "Yes (Default)"
+                  : "Yes (Dark Obsidian Theme)"}
+              </span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Template version</span>
+              <span className="text-base font-semibold font-mono text-purple-300 mt-1.5">{currentVersion}</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Last updated</span>
+              <span className="text-base font-semibold text-white mt-1.5">{lastUpdated}</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Responsive</span>
+              <span className="text-base font-semibold text-white mt-1.5">Yes (Mobile, Tablet & Desktop)</span>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Figma Resource</span>
+              <span className={`text-base font-semibold mt-1.5 ${
+                hasFigmaIncluded
+                  ? "text-violet-300 font-bold"
+                  : hasFigmaAvailable
+                  ? "text-cyan-300 font-bold"
+                  : "text-white/60"
+              }`}>
+                {figma.state === "No Figma File" ? "None (Code-First)" : figma.state}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Template Architecture, Use Case & Scope Breakdown */}
+        <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
+          <div className="border-b border-white/10 pb-4 mb-6">
+            <h2 className="text-xl font-bold text-white">Architecture & Included Scope</h2>
+            <p className="text-xs text-white/50 mt-1">
+              Detailed technical specification covering framework stack, intended use case, included pages and UI sections, pricing, and licensing terms.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Target Use Case */}
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <h3 className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">Target Use Case</h3>
+              <p className="text-sm text-white/80 leading-relaxed">{seoData.useCase}</p>
+            </div>
+
+            {/* Pages & UI Sections Included */}
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <h3 className="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2">Pages & Sections Included</h3>
+              <ul className="flex flex-wrap gap-2 mt-2">
+                {seoData.includedSections.map((sec) => (
+                  <li key={sec} className="rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-white/70">
+                    {sec}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Framework Architecture */}
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2">Framework & Technology</h3>
+              <p className="text-sm text-white/80 leading-relaxed">
+                Built with Next.js 15 (App Router with Server Actions & Static Site Generation), React 19, Tailwind CSS v4, TypeScript 5.7 strict mode, and GPU-accelerated Framer Motion physics.
+              </p>
+            </div>
+
+            {/* Pricing & Commercial Licensing */}
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <h3 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">Pricing & Commercial License</h3>
+              <p className="text-sm text-white/80 leading-relaxed">
+                {isFree ? "100% Free lead magnet" : `${template.price} one-time payment with zero monthly subscriptions`}. Includes a commercial license for unlimited personal and client projects with lifetime source code access.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Compatibility Matrix */}
+        <TemplateCompatibility entries={compatibility} />
+
+        {/* Supported Integrations */}
+        <TemplateIntegrations
+          templateName={template.name}
+          integrations={integrations}
+        />
+
+        {/* Figma Design Resources */}
+        <TemplateFigmaSection
+          figma={figma}
+          templateName={template.name}
+          category={template.category}
+        />
+
+        {/* Verified Quality Indicators */}
+        <TemplateQualityBadges report={qualityReport} />
+
+        {/* Changelog & Release Notes */}
+        <TemplateChangelog
+          templateName={template.name}
+          currentVersion={currentVersion}
+          entries={changelogEntries}
+        />
+
         {/* Reviews Section */}
         <ReviewsSection templateId={template.id} />
 
@@ -266,6 +568,45 @@ export default async function TemplatePage({
             </div>
           );
         })()}
+
+        {/* Related Technical Guides & Articles for Internal SEO Linking */}
+        {relatedGuides.length > 0 && (
+          <div className="mt-16">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-xl font-bold text-white">Related Technical Guides & Articles</h3>
+                <p className="text-xs text-white/50">Tutorials and design deep dives relevant to this template</p>
+              </div>
+              <Link href="/blog" className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+                View all articles →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {relatedGuides.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="group rounded-xl border border-white/10 bg-white/[0.02] p-5 hover:border-purple-500/30 hover:bg-white/[0.04] transition-all"
+                >
+                  <span className={`inline-block mb-2 rounded-full border px-2.5 py-0.5 text-[0.6875rem] font-semibold ${post.tagColor}`}>
+                    {post.tag}
+                  </span>
+                  <h4 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
+                    {post.title}
+                  </h4>
+                  <p className="text-xs text-white/50 mt-2 line-clamp-2 leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                  <div className="mt-4 flex items-center gap-3 text-[0.6875rem] text-white/40">
+                    <span>{post.date}</span>
+                    <span>·</span>
+                    <span>{post.readTime}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

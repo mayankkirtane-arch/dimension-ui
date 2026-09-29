@@ -9,8 +9,19 @@ export async function updateSession(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 
-  // If Supabase isn't configured yet, just pass through
+  // If Supabase isn't configured yet, protect /dashboard based on test session or redirect to login
   if (!url.startsWith("http")) {
+    const testUser = request.cookies.get("sb-test-user")?.value;
+    if (!testUser && request.nextUrl.pathname.startsWith("/dashboard")) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/login";
+      return NextResponse.redirect(redirectUrl);
+    }
+    if (testUser && request.nextUrl.pathname === "/login") {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/dashboard";
+      return NextResponse.redirect(redirectUrl);
+    }
     return NextResponse.next({ request });
   }
 

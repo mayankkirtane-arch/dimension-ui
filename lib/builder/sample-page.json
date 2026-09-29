@@ -1,0 +1,133 @@
+{
+  "$schema": "https://dimensionui.com/schema/builder-page.json",
+  "id": "dimensionui-saas-landing-sample",
+  "version": "1.0.0",
+  "title": "SaaS Launchpad Landing Page",
+  "description": "High-converting modern SaaS landing page composed of Hero, Features, CTA, and Footer blocks.",
+  "tokens": {
+    "preset": "obsidian",
+    "primaryAccent": "#8b5cf6",
+    "secondaryAccent": "#06b6d4",
+    "bgCanvas": "#07070d",
+    "bgSurface": "#0e0e1a",
+    "textColor": "#f1f5f9",
+    "textDimColor": "#94a3b8",
+    "fontFamily": "Inter",
+    "borderRadius": "lg"
+  },
+  "blocks": [
+    {
+      "id": "hero-starter-1",
+      "type": "hero",
+      "props": {
+        "badge": "Next-Generation Vault",
+        "headline": "Build High-Converting Interfaces with",
+        "highlightText": "DimensionUI",
+        "description": "Discover production-ready 3D components, motion primitives, and verified SaaS templates designed for modern web engineering.",
+        "primaryCtaText": "Get Started Free",
+        "primaryCtaLink": "#get-started",
+        "secondaryCtaText": "View Documentation",
+        "secondaryCtaLink": "#docs",
+        "align": "center",
+        "showMockup": true
+      }
+    },
+    {
+      "id": "features-starter-2",
+      "type": "features",
+      "props": {
+        "eyebrow": "Engineered For Speed",
+        "headline": "Everything you need to ship faster",
+        "description": "Carefully calibrated components crafted with strict TypeScript types, GPU-accelerated motion, and Tailwind v4.",
+        "columns": "3",
+        "features": [
+          {
+            "icon": "Zap",
+            "title": "Sub-Millisecond Animations",
+            "description": "Hardware accelerated bezier springs built with Framer Motion 11."
+          },
+          {
+            "icon": "Shield",
+            "title": "Enterprise Type Safety",
+            "description": "Strict TypeScript interfaces and verified zero-dependency class composition."
+          },
+          {
+            "icon": "Layers",
+            "title": "Modular Block Architecture",
+            "description": "Compose entire multi-device landing pages in seconds without code bloat."
+          },
+          {
+            "icon": "Cpu",
+            "title": "Next.js 15 Ready",
+            "description": "Fully compatible with React 19 Server Components and App Router caching."
+          },
+          {
+            "icon": "Palette",
+            "title": "CSS-First Design Tokens",
+            "description": "Tailwind v4 @theme configurations that instantly adapt to your branding."
+          },
+          {
+            "icon": "Terminal",
+            "title": "CLI & MCP Integration",
+            "description": "Direct installation via npx dimensionui and instant AI agent discovery."
+          }
+        ]
+      }
+    },
+    {
+      "id": "cta-starter-3",
+      "type": "cta",
+      "props": {
+        "eyebrow": "Ready to Transform Your Workflow?",
+        "headline": "Start building with DimensionUI today",
+        "description": "Join thousands of developers shipping high-impact products with our verified component ecosystem.",
+        "buttonText": "Claim Your Lifetime Access",
+        "buttonLink": "#pricing",
+        "secondaryText": "One-time purchase · 100% money-back guarantee · Instant delivery",
+        "layout": "centered"
+      }
+    },
+    {
+      "id": "footer-starter-4",
+      "type": "footer",
+      "props": {
+        "brandName": "DimensionUI",
+        "tagline": "The premier 3D and interactive component vault for high-converting interfaces.",
+        "copyrightText": "© 2026 DimensionUI. All rights reserved.",
+        "columns": [
+          {
+            "title": "Product",
+            "links": [
+              { "label": "Templates", "href": "#templates" },
+              { "label": "Blocks", "href": "#blocks" },
+              { "label": "Pricing", "href": "#pricing" },
+              { "label": "Changelog", "href": "#changelog" }
+            ]
+          },
+          {
+            "title": "Resources",
+            "links": [
+              { "label": "Documentation", "href": "#docs" },
+              { "label": "Registry API", "href": "/api/registry" },
+              { "label": "CLI Guide", "href": "#cli" },
+              { "label": "Community", "href": "#community" }
+            ]
+          },
+          {
+            "title": "Legal",
+            "links": [
+              { "label": "Privacy Policy", "href": "#privacy" },
+              { "label": "Terms of Service", "href": "#terms" },
+              { "label": "License Agreement", "href": "#license" }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-09-28T11:45:00.000Z",
+    "updatedAt": "2026-09-28T11:45:00.000Z",
+    "generator": "DimensionUI Page Builder v1.0.0"
+  }
+}

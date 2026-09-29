@@ -19,7 +19,7 @@ export function AiRecommender() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
-      content: "Hi! Describe your project (e.g., 'dental clinic with booking', 'B2B SaaS with pricing', '3D audio studio'), and I'll match the best templates for you.",
+      content: "Hi! Describe your project (e.g., 'cybersecurity platform', 'luxury travel resort', 'e-commerce shop', 'helpdesk SaaS'), and I'll match the best templates for you.",
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -45,9 +45,6 @@ export function AiRecommender() {
           if (term.length > 2 && text.includes(term)) {
             score += 2;
           }
-        }
-        if (terms.some(term => ["3d", "particle", "webgl", "gpu"].includes(term)) && t.tier === "30") {
-          score += 5;
         }
         if (terms.some(term => ["free", "cheap", "$0"].includes(term)) && t.tier === "free") {
           score += 5;

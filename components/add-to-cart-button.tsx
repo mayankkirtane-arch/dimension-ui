@@ -6,13 +6,14 @@
  */
 import { useCartStore } from "@/lib/store";
 import type { TemplateItem } from "@/lib/site";
-import { CHECKOUT_URL } from "@/lib/site";
 import { ShoppingCart, Download, Check } from "lucide-react";
 import { useState } from "react";
+import { PayPalCheckoutModal } from "@/components/paypal-checkout-modal";
 
 export function AddToCartButton({ template }: { template: TemplateItem }) {
   const { items, addItem } = useCartStore();
   const [added, setAdded] = useState(false);
+  const [isPayPalOpen, setIsPayPalOpen] = useState(false);
   const isInCart = items.some((i) => i.id === template.id);
   const isFree = template.tier === "free";
 
@@ -49,34 +50,42 @@ export function AddToCartButton({ template }: { template: TemplateItem }) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <button
-        onClick={handleAddToCart}
-        disabled={isInCart}
-        className={`w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-all ${
-          isInCart || added
-            ? "bg-emerald-600 cursor-default"
-            : "bg-gradient-to-r from-purple-600 to-cyan-500 hover:brightness-110"
-        }`}
-      >
-        {isInCart || added ? (
-          <>
-            <Check className="size-4" />
-            Added to Cart
-          </>
-        ) : (
-          <>
-            <ShoppingCart className="size-4" />
-            Add to Cart — {template.price}
-          </>
-        )}
-      </button>
-      <button
-        onClick={() => window.open(CHECKOUT_URL, "_blank", "noopener,noreferrer")}
-        className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] py-3 text-sm font-medium text-white/70 hover:text-white transition-all"
-      >
-        Buy Now — {template.price}
-      </button>
-    </div>
+    <>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleAddToCart}
+          disabled={isInCart}
+          className={`w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-all ${
+            isInCart || added
+              ? "bg-emerald-600 cursor-default"
+              : "bg-gradient-to-r from-purple-600 to-cyan-500 hover:brightness-110"
+          }`}
+        >
+          {isInCart || added ? (
+            <>
+              <Check className="size-4" />
+              Added to Cart
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="size-4" />
+              Add to Cart — {template.price}
+            </>
+          )}
+        </button>
+        <button
+          onClick={() => setIsPayPalOpen(true)}
+          className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] py-3 text-sm font-medium text-white/70 hover:text-white transition-all"
+        >
+          Buy with PayPal — {template.price}
+        </button>
+      </div>
+
+      <PayPalCheckoutModal
+        template={template}
+        isOpen={isPayPalOpen}
+        onClose={() => setIsPayPalOpen(false)}
+      />
+    </>
   );
 }

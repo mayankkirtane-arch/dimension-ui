@@ -58,7 +58,7 @@ export default function Home() {
               {
                 "@type": "Question",
                 name: "Do you offer free Next.js templates?",
-                acceptedAnswer: { "@type": "Answer", text: "Yes. DimensionUI offers several completely free Next.js templates. Premium templates start at $15 and go up to $30 for advanced 3D templates." },
+                acceptedAnswer: { "@type": "Answer", text: "Yes. DimensionUI offers several completely free Next.js templates. Premium templates start at $15 and go up to $20 for masterclass interactive templates." },
               },
             ],
           }),

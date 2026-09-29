@@ -12,7 +12,6 @@ import {
 } from "react";
 
 import { AccentPill, EASE } from "@/components/ui/primitives";
-import { Mockup3D } from "@/components/mockup-3d";
 import { cn } from "@/lib/cn";
 import { scrollToHash } from "@/lib/hooks";
 import {
@@ -33,7 +32,7 @@ import {
  *
  * `lib/site.ts` deliberately keeps `GalleryItem` minimal (name / blurb /
  * market / tier / icon) so the content model stays serialisable. Rather than
- * fattening every one of the 42 records with a code sample and a prompt, the
+ * fattening every one of the 32 records with a code sample and a prompt, the
  * modal *derives* them from the item, and these fields let a specific entry
  * override that derivation when real source is available.
  */
@@ -67,7 +66,7 @@ type TabId = "preview" | "code" | "prompt";
 /* ------------------------------------------------------------------ */
 /*  Derivation helpers                                                */
 /*                                                                    */
-/*  The modal must be useful for all 42 components without 42 hand-    */
+/*  The modal must be useful for all 32 templates without 32 hand-     */
 /*  written samples, so preview / code / prompt are generated from the */
 /*  item's own metadata. Deterministic, so the same card always shows  */
 /*  the same snippet.                                                  */
@@ -97,7 +96,6 @@ const ACCENT_HEX: Record<Accent, string> = {
 };
 
 const TIER_HINT: Record<GalleryItem["tier"], string> = {
-  "3D": "a GPU-friendly interactive surface. Use HTML5 Canvas or CSS 3D only — no three.js",
   Motion: "motion that clarifies hierarchy. Animate transform and opacity only, never layout",
   Static: "a layout that stays crisp with no animation at all",
 };
@@ -639,8 +637,7 @@ export function CodeModal({ item, onClose }: CodeModalProps) {
 
   const accent: Accent = market?.accent ?? "purple";
   const categoryLabel = market?.label ?? "Template";
-  // The 3D tier is the premium one, so it carries the upgrade prompt.
-  const isPro = item ? (item.pro ?? item.tier === "3D") : false;
+  const isPro = item ? (item.pro ?? false) : false;
 
   const code = useMemo(
     () => (item ? (item.code ?? generateCode(item, accent)) : ""),
@@ -777,11 +774,6 @@ export function CodeModal({ item, onClose }: CodeModalProps) {
               >
                 {item.preview ?? (
                   <>
-                    {item.tier === "3D" && (
-                      <div className="relative w-full h-[500px] overflow-hidden rounded-xl border border-white/10">
-                        <Mockup3D itemId={item.id || ""} />
-                      </div>
-                    )}
                     {item.tier === "Motion" && (
                       <StepperPreview accent={accent} title={item.name} />
                     )}

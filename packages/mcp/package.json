@@ -1,0 +1,26 @@
+{
+  "name": "@dimensionui/mcp-server",
+  "version": "1.0.0",
+  "description": "Official Model Context Protocol (MCP) server for DimensionUI — enables AI coding agents to discover templates, blocks, and design components from the registry.",
+  "main": "src/index.js",
+  "bin": {
+    "dimensionui-mcp": "./bin/dimensionui-mcp.js"
+  },
+  "scripts": {
+    "start": "node ./bin/dimensionui-mcp.js",
+    "test": "node ../../scripts/test-mcp.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "dimensionui",
+    "ai-agent",
+    "nextjs",
+    "registry"
+  ],
+  "author": "DimensionUI Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

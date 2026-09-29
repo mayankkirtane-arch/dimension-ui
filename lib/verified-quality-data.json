@@ -1,0 +1,79 @@
+{
+  "auditDate": "September 27, 2026",
+  "environment": "Local Next.js 15.5.25 Production Build (Port 3005, Headless Chrome, Lighthouse 13.5.0)",
+  "runner": "Google Lighthouse 13.5.0, Next.js 15.5.25, TypeScript 5.7.3",
+  "typeScriptCheck": {
+    "tool": "tsc --noEmit",
+    "status": "Passed",
+    "errors": 0,
+    "testDate": "September 27, 2026"
+  },
+  "productionBuildCheck": {
+    "tool": "next build",
+    "status": "Passed",
+    "staticPagesCount": 54,
+    "testDate": "September 27, 2026"
+  },
+  "templates": {
+    "aether-ai-saas": {
+      "templateId": "aether-ai-saas",
+      "testUrl": "http://localhost:3005/template/aether-ai-saas",
+      "testDate": "September 27, 2026",
+      "environment": "Local Next.js 15.5.25 Production Build (Headless Chrome 13.5.0)",
+      "scores": {
+        "performance": 73,
+        "accessibility": 86,
+        "bestPractices": 96,
+        "seo": 100
+      }
+    },
+    "serenity-wellness": {
+      "templateId": "serenity-wellness",
+      "testUrl": "http://localhost:3005/template/serenity-wellness",
+      "testDate": "September 27, 2026",
+      "environment": "Local Next.js 15.5.25 Production Build (Headless Chrome 13.5.0)",
+      "scores": {
+        "performance": 79,
+        "accessibility": 86,
+        "bestPractices": 96,
+        "seo": 100
+      }
+    },
+    "nova-minimal-portfolio": {
+      "templateId": "nova-minimal-portfolio",
+      "testUrl": "http://localhost:3005/template/nova-minimal-portfolio",
+      "testDate": "September 27, 2026",
+      "environment": "Local Next.js 15.5.25 Production Build (Headless Chrome 13.5.0)",
+      "scores": {
+        "performance": 74,
+        "accessibility": 86,
+        "bestPractices": 96,
+        "seo": 100
+      }
+    },
+    "app-launch-lp": {
+      "templateId": "app-launch-lp",
+      "testUrl": "http://localhost:3005/template/app-launch-lp",
+      "testDate": "September 27, 2026",
+      "environment": "Local Next.js 15.5.25 Production Build (Headless Chrome 13.5.0)",
+      "scores": {
+        "performance": 74,
+        "accessibility": 86,
+        "bestPractices": 96,
+        "seo": 100
+      }
+    },
+    "peak-fitness": {
+      "templateId": "peak-fitness",
+      "testUrl": "http://localhost:3005/template/peak-fitness",
+      "testDate": "September 27, 2026",
+      "environment": "Local Next.js 15.5.25 Production Build (Headless Chrome 13.5.0)",
+      "scores": {
+        "performance": 74,
+        "accessibility": 86,
+        "bestPractices": 96,
+        "seo": 100
+      }
+    }
+  }
+}

@@ -1,12 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, useMemo } from "react";
-import { Search, Sparkles, Download, Eye, ExternalLink, Check, ArrowRight, Scale, SlidersHorizontal, Filter, Heart, TrendingUp, Sparkles as SparklesSolid } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Search, Sparkles, Download, Eye, ExternalLink, Check, ArrowRight, Scale, SlidersHorizontal, Filter, Heart, TrendingUp, Sparkles as SparklesSolid, X } from "lucide-react";
 import { RecentlyViewed, trackView } from "@/components/recently-viewed";
 import { TemplateRequestModal } from "@/components/template-request-modal";
 import { useCompareStore } from "@/components/template-compare-drawer";
-import { Mockup3D } from "@/components/mockup-3d";
 import { useCartStore } from "@/lib/store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { CodeModal, type CodeModalItem } from "@/components/code-modal";
@@ -63,6 +62,22 @@ const PHOTOS: Record<string, {src:string;overlay:string;chip:string}> = {
   "cryptostaking-protocol":{src:"1639762681485-074b7f938ba0",overlay:"from-indigo-900/80 via-black/50 to-black/80",chip:"APY calculator"},
   "venture-fund-capital":  {src:"1611974789855-9c2a0a7236a3",overlay:"from-purple-900/80 via-black/50 to-black/80",chip:"Portfolio filter"},
   "healthpulse-telehealth":{src:"1576091160399-112ba8d25d1d",overlay:"from-teal-900/70 via-black/40 to-black/80",chip:"Video room"},
+  // NEW $20 TEMPLATES
+  "sentinel-security":     {src:"1563986768609-322da13575f3",overlay:"from-cyan-950/80 via-black/50 to-black/80",chip:"Threat Monitoring"},
+  "voyage-atlas":          {src:"1488646953014-85cb44e25828",overlay:"from-amber-950/80 via-black/50 to-black/80",chip:"Expedition Tours"},
+  "supportdesk":           {src:"1531403009284-440f080d1e12",overlay:"from-indigo-950/80 via-black/50 to-black/80",chip:"Shared Inbox"},
+  "stayora":                {src:"1582719508461-905c673771fd",overlay:"from-amber-950/80 via-black/50 to-black/80",chip:"Boutique Resort"},
+  "cartly-commerce":       {src:"1441986300917-64674bd600d8",overlay:"from-purple-950/80 via-black/50 to-black/80",chip:"Online Store"},
+  "freshbite":             {src:"1504674900247-0877df9cc836",overlay:"from-emerald-950/80 via-black/50 to-black/80",chip:"Digital Menu"},
+  "fleetflow":             {src:"1586528116311-ad8dd3c8310d",overlay:"from-cyan-950/80 via-black/50 to-black/80",chip:"Fleet Telematics"},
+  "insurely":              {src:"1450133064473-71024230f91b",overlay:"from-sky-950/80 via-black/50 to-black/80",chip:"Policy Finder"},
+  "fundora":               {src:"1590283603385-17ffb3a7f29f",overlay:"from-violet-950/80 via-black/50 to-black/80",chip:"Wealth Advisory"},
+  "scalehr":               {src:"1522071820081-009f0129c71c",overlay:"from-purple-950/80 via-black/50 to-black/80",chip:"People Platform"},
+  "nonprofitly":           {src:"1488521787991-ed7bbaae773c",overlay:"from-emerald-950/80 via-black/50 to-black/80",chip:"Impact Donor"},
+  "eventspace":            {src:"1511578314322-379afb476865",overlay:"from-indigo-950/80 via-black/50 to-black/80",chip:"Summit Agenda"},
+  "adpilot":               {src:"1460925895917-afdab827c52f",overlay:"from-cyan-950/80 via-black/50 to-black/80",chip:"ROAS Optimizer"},
+  "homenest":              {src:"1618221195710-dd6b41faaea6",overlay:"from-amber-950/80 via-black/50 to-black/80",chip:"Interior Design"},
+  "streamline":            {src:"1484480974693-6ca0a78fb36b",overlay:"from-violet-950/80 via-black/50 to-black/80",chip:"Kanban Workspace"},
 };
 
 export function GallerySection() {
@@ -70,9 +85,90 @@ export function GallerySection() {
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<CodeModalItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedFramework, setSelectedFramework] = useState<string>("all");
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const categoryOptions = [
+    { id: "all", label: "All Categories" },
+    { id: "saas", label: "SaaS & AI" },
+    { id: "b2b", label: "B2B & Enterprise" },
+    { id: "cybersecurity", label: "Cybersecurity" },
+    { id: "travel", label: "Travel & Tours" },
+    { id: "local", label: "Local Business" },
+    { id: "fintech", label: "Fintech" },
+    { id: "portfolio", label: "Portfolio & Creator" },
+  ];
+
+  const frameworkOptions = [
+    { id: "all", label: "All Frameworks" },
+    { id: "nextjs", label: "Next.js 15" },
+  ];
+
+  const featureOptions = [
+    { id: "darkMode", label: "Dark Mode", emoji: "🌙" },
+    { id: "auth", label: "Auth", emoji: "🔐" },
+    { id: "dashboard", label: "Dashboard", emoji: "📊" },
+    { id: "cms", label: "CMS", emoji: "📝" },
+    { id: "animation", label: "Animation", emoji: "✨" },
+  ];
+
+  const toggleFeature = (featureId: string) => {
+    setSelectedFeatures((prev) =>
+      prev.includes(featureId) ? prev.filter((f) => f !== featureId) : [...prev, featureId]
+    );
+  };
+
+  const clearAllFilters = () => {
+    setFilter("all");
+    setSearch("");
+    setSelectedCategory("all");
+    setSelectedFramework("all");
+    setSelectedFeatures([]);
+    setShowFavoritesOnly(false);
+  };
+
+  const hasActiveFilters =
+    filter !== "all" ||
+    search.trim().length > 0 ||
+    selectedCategory !== "all" ||
+    selectedFramework !== "all" ||
+    selectedFeatures.length > 0 ||
+    showFavoritesOnly;
+
+  const activeFilterCount =
+    (filter !== "all" ? 1 : 0) +
+    (search.trim() ? 1 : 0) +
+    (selectedCategory !== "all" ? 1 : 0) +
+    (selectedFramework !== "all" ? 1 : 0) +
+    selectedFeatures.length +
+    (showFavoritesOnly ? 1 : 0);
+
+  const hasFeature = (item: TemplateItem, feature: string) => {
+    const text = (item.name + " " + item.blurb + " " + item.category + " " + item.features.join(" ")).toLowerCase();
+    switch (feature) {
+      case "darkMode":
+        return item.features.some((f) => /dark/i.test(f)) || /dark/i.test(item.blurb);
+      case "auth":
+        return /auth|login|signup|waitlist|account|booking|appointment|form/i.test(text);
+      case "dashboard":
+        return /dashboard|analytics|metric|admin|runner|pipeline|console|billing|portal/i.test(text);
+      case "cms":
+        return /cms|blog|case stud|changelog|markdown|syllabus/i.test(text);
+      case "animation":
+        return item.tier === "20" || /motion|framer|animation|animated|parallax|canvas|hover|slider|carousel|countdown|interactive|real-time/i.test(text);
+      default:
+        return true;
+    }
+  };
   const { items: cartItems, addItem } = useCartStore();
   const { ids: wishlistIds, toggle: toggleWishlist } = useWishlistStore();
-  const { addTemplate: addToCompare, selectedIds: compareIds } = useCompareStore();
+  const { toggleTemplate: toggleCompare, selectedIds: compareIds, setOpen: setCompareOpen } = useCompareStore();
 
   const tabs: { id: TemplateTier; label: string; count: number; badgeStyle?: string }[] = [
     { id: "all", label: "All Templates", count: TIER_COUNTS.all },
@@ -84,26 +180,53 @@ export function GallerySection() {
     },
     { id: "15", label: "$15 Templates", count: TIER_COUNTS["15"] },
     { id: "20", label: "$20 Masterclass", count: TIER_COUNTS["20"] },
-    { id: "30", label: "$30 3D Tier", count: TIER_COUNTS["30"] },
   ];
 
   const visible = useMemo(() => {
     return TEMPLATES.filter((item) => {
+      // 0. Favorites filter
+      if (showFavoritesOnly && (!mounted || !wishlistIds.includes(item.id))) {
+        return false;
+      }
+      // 1. Price / Tier
       const matchesTier = filter === "all" || item.tier === filter;
+
+      // 2. Category
+      const catQuery = selectedCategory.toLowerCase();
+      const matchesCategory =
+        selectedCategory === "all" ||
+        item.category.toLowerCase().includes(catQuery) ||
+        (catQuery === "saas" && (item.category.includes("SaaS") || item.category.includes("Dev") || item.category.includes("Tech"))) ||
+        (catQuery === "local" && (item.category.includes("Local") || item.category.includes("Fitness") || item.category.includes("Clinic") || item.category.includes("Contractor") || item.category.includes("Beauty") || item.category.includes("Law") || item.category.includes("Bistro"))) ||
+        (catQuery === "b2b" && (item.category.includes("B2B") || item.category.includes("Finance") || item.category.includes("Corporate") || item.category.includes("Accounting"))) ||
+        (catQuery === "portfolio" && (item.category.includes("Portfolio") || item.category.includes("Creator"))) ||
+        (catQuery === "fintech" && (item.category.includes("Fintech") || item.category.includes("Finance")));
+
+      // 3. Search query
       const query = search.trim().toLowerCase();
       const matchesSearch =
         !query ||
         item.name.toLowerCase().includes(query) ||
         item.blurb.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query);
-      return matchesTier && matchesSearch;
+        item.category.toLowerCase().includes(query) ||
+        item.features.some((f) => f.toLowerCase().includes(query)) ||
+        item.integrations?.some((i) => i.name.toLowerCase().includes(query) || i.description.toLowerCase().includes(query)) ||
+        (item.figma && (item.figma.state.toLowerCase().includes(query) || (item.figma.notes && item.figma.notes.toLowerCase().includes(query))));
+
+      // 4. Framework (all templates built on Next.js 15)
+      const matchesFramework = selectedFramework === "all" || selectedFramework === "nextjs";
+
+      // 5. Feature filters (all selected features must match)
+      const matchesFeatures = selectedFeatures.every((f) => hasFeature(item, f));
+
+      return matchesTier && matchesCategory && matchesSearch && matchesFramework && matchesFeatures;
     });
-  }, [filter, search]);
+  }, [showFavoritesOnly, mounted, wishlistIds, filter, selectedCategory, search, selectedFramework, selectedFeatures]);
 
   const handleOpenPreview = (item: TemplateItem) => {
     trackView(item.id);
     let customPreview = undefined;
-    if (item.mockupType !== "3d" && PHOTOS[item.id]) {
+    if (PHOTOS[item.id]) {
       customPreview = (
         <div className="flex flex-col items-center gap-6 py-4">
           <div className="w-full max-w-4xl rounded-2xl border border-white/10 bg-black/30 overflow-hidden relative h-[400px] shadow-2xl">
@@ -140,7 +263,7 @@ export function GallerySection() {
       name: item.name,
       blurb: item.blurb,
       market: "saas",
-      tier: item.tier === "30" ? "3D" : item.tier === "20" ? "Motion" : "Static",
+      tier: item.tier === "20" ? "Motion" : "Static",
       icon: "layout-grid",
       pro: item.tier !== "free",
       preview: customPreview,
@@ -169,49 +292,67 @@ export function GallerySection() {
     <SectionShell id="gallery">
       <SectionHeader
         eyebrow="Website Templates"
-        title="42 Production-Ready Website Templates"
-        description="Clean Next.js 15 & React codebases. Copy free starters or download complete masterclass & 3D templates for commercial launch."
+        title="47 Production-Ready Website Templates"
+        description="Clean Next.js 15 & React codebases. Copy free starters or download complete masterclass templates for commercial launch."
         centered
       />
 
-      {/* Control Bar: Categories on left, Search on right */}
-      <Reveal delay={0.1} className="mt-9">
+      {/* Control Bar: Category tabs, Price filter, Search, and Feature filters */}
+      <Reveal delay={0.1} className="mt-9 flex flex-col gap-4">
+        {/* Row 1: Category tabs and Search */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Category Tabs */}
           <div
             role="tablist"
-            aria-label="Filter templates by tier"
-            className="flex flex-wrap items-center gap-2"
+            aria-label="Filter templates by category"
+            className="flex flex-wrap items-center gap-1.5"
           >
-            {tabs.map((tab) => {
-              const active = filter === tab.id;
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-faint mr-1 hidden sm:inline">Category:</span>
+            {categoryOptions.map((cat) => {
+              const active = selectedCategory === cat.id;
               return (
                 <button
-                  key={tab.id}
+                  key={cat.id}
                   type="button"
                   role="tab"
                   aria-selected={active}
-                  onClick={() => setFilter(tab.id)}
+                  onClick={() => setSelectedCategory(cat.id)}
                   className={cn(
-                    "relative inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[0.8125rem] font-medium transition-all duration-300",
+                    "relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200",
                     active
-                      ? tab.badgeStyle || "border-hairline-strong text-ink bg-white/[0.08]"
-                      : "border-hairline text-ink-dim hover:border-hairline-strong hover:text-ink hover:bg-white/[0.04]",
+                      ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-300 font-semibold shadow-[0_0_12px_rgba(6,182,212,0.25)]"
+                      : "border-hairline text-ink-dim hover:border-hairline-strong hover:text-ink hover:bg-white/[0.04]"
                   )}
                 >
-                  <span className="relative z-10">{tab.label}</span>
-                  <span
-                    className={cn(
-                      "relative z-10 rounded-full px-2 py-0.5 font-mono text-[0.6875rem]",
-                      active ? "bg-white/15 text-ink" : "bg-white/[0.06] text-ink-faint",
-                    )}
-                  >
-                    {tab.count}
-                  </span>
+                  <span>{cat.label}</span>
                 </button>
               );
             })}
           </div>
+
+          {/* Favorites View Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+            aria-pressed={showFavoritesOnly}
+            className={cn(
+              "relative inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300",
+              showFavoritesOnly
+                ? "border-red-500/50 bg-red-500/20 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.35)]"
+                : "border-hairline text-ink-dim hover:border-hairline-strong hover:text-ink hover:bg-white/[0.04]"
+            )}
+          >
+            <Heart className={cn("size-3.5 transition-colors", showFavoritesOnly ? "fill-red-500 text-red-500" : "text-white/40")} />
+            <span>Favorites</span>
+            <span
+              className={cn(
+                "rounded-full px-1.5 py-0.2 font-mono text-[0.6875rem]",
+                showFavoritesOnly ? "bg-red-500/30 text-white font-bold" : "bg-white/[0.06] text-ink-faint"
+              )}
+            >
+              {mounted ? wishlistIds.length : 0}
+            </span>
+          </button>
 
           {/* Search bar */}
           <div className="relative w-full lg:w-72">
@@ -221,20 +362,132 @@ export function GallerySection() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search all templates..."
-              className="w-full rounded-full border border-hairline bg-surface/80 py-2 pr-4 pl-10 text-[0.8125rem] text-ink placeholder:text-ink-faint backdrop-blur-xl transition-all duration-300 focus:border-neon-purple-bright/60 focus:bg-surface focus:outline-none focus:ring-1 focus:ring-neon-purple-bright/40"
+              className="w-full rounded-full border border-hairline bg-surface/80 py-2 pr-9 pl-10 text-[0.8125rem] text-ink placeholder:text-ink-faint backdrop-blur-xl transition-all duration-300 focus:border-neon-purple-bright/60 focus:bg-surface focus:outline-none focus:ring-1 focus:ring-neon-purple-bright/40"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-ink-faint hover:text-ink hover:bg-white/10"
+                aria-label="Clear search"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Row 2: Price Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/[0.06]">
+          <span className="text-xs font-semibold uppercase tracking-wider text-ink-faint mr-1 hidden sm:inline">Price:</span>
+          {tabs.map((tab) => {
+            const active = filter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setFilter(tab.id)}
+                className={cn(
+                  "relative inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-all duration-200",
+                  active
+                    ? tab.badgeStyle || "border-hairline-strong text-ink bg-white/[0.08]"
+                    : "border-hairline text-ink-dim hover:border-hairline-strong hover:text-ink hover:bg-white/[0.04]"
+                )}
+              >
+                <span className="relative z-10">{tab.label}</span>
+                <span
+                  className={cn(
+                    "relative z-10 rounded-full px-1.5 py-0.5 font-mono text-[0.6875rem]",
+                    active ? "bg-white/15 text-ink" : "bg-white/[0.06] text-ink-faint"
+                  )}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Row 3: Feature Filters (Framework, Dark mode, Auth, Dashboard, 3D, CMS, Animation) & Clear Action */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/[0.06]">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-faint mr-1 hidden sm:inline">Features:</span>
+
+            {/* Framework Filter */}
+            <div className="inline-flex items-center rounded-full border border-hairline bg-white/[0.02] p-0.5">
+              {frameworkOptions.map((fw) => {
+                const active = selectedFramework === fw.id;
+                return (
+                  <button
+                    key={fw.id}
+                    type="button"
+                    onClick={() => setSelectedFramework(fw.id)}
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-[0.6875rem] font-medium transition-all",
+                      active
+                        ? "bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold"
+                        : "text-ink-dim hover:text-ink"
+                    )}
+                  >
+                    {fw.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Feature Toggles */}
+            {featureOptions.map((feat) => {
+              const active = selectedFeatures.includes(feat.id);
+              return (
+                <button
+                  key={feat.id}
+                  type="button"
+                  onClick={() => toggleFeature(feat.id)}
+                  aria-pressed={active}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all duration-200",
+                    active
+                      ? "border-purple-400/50 bg-purple-500/15 text-purple-200 font-semibold shadow-[0_0_12px_rgba(168,85,247,0.25)]"
+                      : "border-hairline text-ink-dim hover:border-hairline-strong hover:text-ink hover:bg-white/[0.04]"
+                  )}
+                >
+                  <span>{feat.emoji}</span>
+                  <span>{feat.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active summary & Clear Filters */}
+          <div className="flex items-center gap-3 ml-auto">
+            <span className="text-xs text-ink-dim">
+              Showing <strong className="text-ink">{visible.length}</strong> of {TEMPLATES.length}
+            </span>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-300 hover:bg-red-500/20 hover:border-red-500/50 transition-all"
+              >
+                <X className="size-3" />
+                <span>Clear Filters ({activeFilterCount})</span>
+              </button>
+            )}
           </div>
         </div>
       </Reveal>
 
-      {/* Grid of Browser-Framed Cards */}
+            {/* Grid of Browser-Framed Cards */}
       <ul className="mt-9 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {visible.map((item) => {
             const isFree = item.tier === "free";
-            const isWishlisted = wishlistIds.includes(item.id);
+            const isWishlisted = mounted && wishlistIds.includes(item.id);
+            const isCompared = mounted && compareIds.includes(item.id);
             const itemIndex = TEMPLATES.indexOf(item);
-            const purchaseCount = [47, 83, 124, 31, 67, 91, 158, 22, 44, 76, 112, 38, 55, 93, 141, 29, 68, 87, 103, 51, 72, 116, 34, 88, 145, 41, 63, 99, 127, 57, 84, 132, 26, 73, 108, 89, 147, 43, 61, 95, 119, 77][itemIndex % 42] || 47;
+            const purchaseCount = [47, 83, 124, 31, 67, 91, 158, 22, 44, 76, 112, 38, 55, 93, 141, 29, 68, 87, 103, 51, 72, 116, 34, 88, 145, 41, 63, 99, 127, 57, 84, 132, 65, 89, 142, 54, 78, 115, 62, 98, 134, 71, 106, 85, 129, 93, 118][itemIndex % 47] || 47;
             const isNew = itemIndex < 5; // First 5 templates are "New"
 
             return (
@@ -267,13 +520,46 @@ export function GallerySection() {
                           ✦ New
                         </span>
                       )}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); toggleWishlist(item.id); }}
-                        aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                        className="rounded-full p-1 transition-colors hover:bg-white/10"
-                      >
-                        <Heart className={cn("size-3.5 transition-colors", isWishlisted ? "fill-red-500 text-red-500" : "text-white/30")} />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        {/* Compare Action */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const added = toggleCompare(item.id);
+                            if (!added && !compareIds.includes(item.id)) {
+                              setCompareOpen(true);
+                            }
+                          }}
+                          aria-label={isCompared ? "Remove from comparison" : "Add to comparison"}
+                          title={
+                            isCompared
+                              ? "Remove from comparison"
+                              : compareIds.length >= 3
+                              ? "Max 3 templates in comparison — click to view"
+                              : "Compare template (select 2 or 3)"
+                          }
+                          className={cn(
+                            "rounded-full p-1.5 transition-all focus:outline-none",
+                            isCompared
+                              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                              : "text-white/40 hover:text-white hover:bg-white/10"
+                          )}
+                        >
+                          <Scale className="size-3.5" />
+                        </button>
+
+                        {/* Favorite Action */}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); toggleWishlist(item.id); }}
+                          aria-label={isWishlisted ? "Remove from favorites" : "Add to favorites"}
+                          title={isWishlisted ? "Remove from favorites" : "Add to favorites"}
+                          className="rounded-full p-1.5 transition-transform hover:bg-white/10 active:scale-125 focus:outline-none"
+                        >
+                          <Heart className={cn("size-4 transition-all duration-200", isWishlisted ? "fill-red-500 text-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "text-white/40 hover:text-white")} />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Window path URL */}
@@ -286,7 +572,7 @@ export function GallerySection() {
 
                   {/* Thumbnail */}
                   <div className="relative h-48 sm:h-52 w-full overflow-hidden transition-transform duration-700 group-hover:scale-[1.015]">
-                    {item.mockupType !== "3d" && PHOTOS[item.id] && (
+                    {PHOTOS[item.id] && (
                       <div className="absolute inset-0">
                         <img
                           src={`https://images.unsplash.com/photo-${PHOTOS[item.id].src}?w=600&q=80&auto=format&fit=crop`}
@@ -311,8 +597,6 @@ export function GallerySection() {
                         </div>
                       </div>
                     )}
-
-                    {item.mockupType === "3d" && <Mockup3D itemId={item.id} />}
                   </div>
 
                   <div className="flex flex-col gap-3 border-t border-hairline bg-surface/90 px-4 py-3.5">
@@ -330,13 +614,9 @@ export function GallerySection() {
                         <span className="shrink-0 rounded-full border border-cyan-400/35 bg-cyan-400/15 px-2.5 py-0.5 font-mono text-[0.6875rem] font-semibold text-cyan-400">
                           $15
                         </span>
-                      ) : item.tier === "20" ? (
+                      ) : (
                         <span className="shrink-0 rounded-full border border-purple-400/35 bg-purple-400/15 px-2.5 py-0.5 font-mono text-[0.6875rem] font-semibold text-purple-300">
                           $20
-                        </span>
-                      ) : (
-                        <span className="shrink-0 rounded-full border border-neon-purple/50 bg-gradient-to-r from-neon-purple/20 to-electric-cyan/20 px-2.5 py-0.5 font-mono text-[0.6875rem] font-semibold text-white shadow-[0_0_12px_rgba(139,92,246,0.35)]">
-                          $30 3D
                         </span>
                       )}
                     </div>
@@ -372,6 +652,46 @@ export function GallerySection() {
           })}
         </AnimatePresence>
       </ul>
+
+      {/* Empty State */}
+      {visible.length === 0 && (
+        <div className="mt-9 rounded-2xl border border-white/10 bg-white/[0.02] p-12 text-center">
+          {showFavoritesOnly ? (
+            <div className="flex flex-col items-center">
+              <div className="flex size-14 items-center justify-center rounded-full bg-red-500/10 border border-red-500/20 text-red-400 mb-4 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+                <Heart className="size-7 text-red-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white">No favorites saved yet</h3>
+              <p className="mt-2 text-xs sm:text-sm text-white/50 max-w-md mx-auto leading-relaxed">
+                Click the heart icon on any template card to bookmark your favorite designs here for quick access anytime without logging in.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowFavoritesOnly(false)}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 px-6 py-2.5 text-xs font-bold text-white hover:brightness-110 transition-all shadow-lg"
+              >
+                <span>Browse All Templates</span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center">
+              <Filter className="mx-auto size-8 text-white/30 mb-3" />
+              <h3 className="text-lg font-bold text-white">No matching templates found</h3>
+              <p className="mt-1 text-xs text-white/50 max-w-sm mx-auto">
+                No templates match the current combination of search, price, category, and feature filters.
+              </p>
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="mt-5 inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white hover:bg-white/20 transition-all"
+              >
+                <X className="size-3.5" />
+                <span>Reset All Filters</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Code Modal */}
       <CodeModal item={selectedItem} onClose={() => setSelectedItem(null)} />

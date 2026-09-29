@@ -5,6 +5,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft, Calendar, Clock, ArrowRight } from "lucide-react";
+import { BLOG_POSTS } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: 'Blog — Next.js Templates, SaaS Design & Web Dev Tips',
@@ -20,48 +21,33 @@ export const metadata: Metadata = {
   },
 };
 
-const POSTS = [
-  {
-    slug: "how-to-launch-saas-landing-page",
-    title: "How to Launch a SaaS Landing Page in Under 10 Minutes",
-    excerpt: "A step-by-step walkthrough of setting up DimensionUI's Aether AI SaaS template in your Next.js project — from clone to deployed.",
-    date: "2026-09-18",
-    readTime: "5 min read",
-    tag: "Tutorial",
-    tagColor: "text-cyan-400 bg-cyan-500/10 border-cyan-500/30",
-  },
-  {
-    slug: "3d-websites-convert-better",
-    title: "Why 3D Websites Convert 2× Better Than Flat Designs",
-    excerpt: "We analyzed 50 landing pages and found that interactive 3D elements increase time-on-site by 78% and conversion rates by 2×. Here's the data.",
-    date: "2026-09-12",
-    readTime: "7 min read",
-    tag: "Research",
-    tagColor: "text-purple-400 bg-purple-500/10 border-purple-500/30",
-  },
-  {
-    slug: "best-saas-templates-2026",
-    title: "10 Best SaaS Website Templates of 2026",
-    excerpt: "We curated the top 10 SaaS templates that are converting the best this year — from AI tools to B2B platforms.",
-    date: "2026-09-05",
-    readTime: "9 min read",
-    tag: "Roundup",
-    tagColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
-  },
-  {
-    slug: "tailwind-framer-motion-animations",
-    title: "Tailwind + Framer Motion: The Perfect Animation Stack",
-    excerpt: "Learn how we combine Tailwind CSS utility classes with Framer Motion variants to create the silky 60fps animations you see in DimensionUI.",
-    date: "2026-08-28",
-    readTime: "6 min read",
-    tag: "Deep Dive",
-    tagColor: "text-orange-400 bg-orange-500/10 border-orange-500/30",
-  },
-];
-
 export default function BlogPage() {
   return (
     <div className="min-h-screen bg-[#06060b] text-white">
+      {/* Breadcrumb Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://dimensionui.com",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Blog",
+                item: "https://dimensionui.com/blog",
+              },
+            ],
+          }),
+        }}
+      />
       <div className="pointer-events-none fixed inset-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 size-[700px] rounded-full bg-purple-600/5 blur-[160px]" />
       </div>
@@ -77,13 +63,20 @@ export default function BlogPage() {
       </nav>
 
       <main className="mx-auto max-w-4xl px-6 py-16">
+        {/* Semantic Breadcrumbs */}
+        <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-xs text-white/40">
+          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <span>/</span>
+          <span className="text-white/80 font-medium" aria-current="page">Blog</span>
+        </nav>
+
         <div className="mb-12">
-          <h1 className="text-5xl font-black text-white mb-3">Blog</h1>
-          <p className="text-white/50 text-xl">Tutorials, design tips, and inspiration from the DimensionUI team.</p>
+          <h1 className="text-5xl font-black text-white mb-3">Blog & Tutorials</h1>
+          <p className="text-white/50 text-xl">Technical tutorials, design tips, and guides for Next.js 15, Tailwind CSS & Framer Motion.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {POSTS.map((post) => (
+          {BLOG_POSTS.map((post) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
