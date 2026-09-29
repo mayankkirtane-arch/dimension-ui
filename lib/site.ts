@@ -35,8 +35,8 @@ export const NAV_LINKS = [
 export const CTA_HREF = "#gallery";
 export const GALLERY_HREF = "#gallery";
 
-/** Configurable checkout link (e.g., Lemon Squeezy, Gumroad, or Stripe Payment Link) */
-export const CHECKOUT_URL = "https://dimensionui.lemonsqueezy.com/checkout";
+/** Internal checkout link pointing to gallery for template discovery & PayPal checkout */
+export const CHECKOUT_URL = "#gallery";
 
 export const PRICING_CTA = {
   full: "Browse Templates",

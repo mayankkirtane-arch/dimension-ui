@@ -31,4 +31,4 @@ The user has switched chat sessions. Read this file to instantly catch up on the
 The project is fully production-ready from a code and SEO standpoint. The likely next steps involve:
 1. Deploying to Vercel.
 2. Integrating a real database (Supabase) as currently it relies on placeholder env variables.
-3. Adding a real payment gateway (LemonSqueezy/Stripe).
+3. PayPal Sandbox checkout integration.

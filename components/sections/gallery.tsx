@@ -9,6 +9,7 @@ import { useCompareStore } from "@/components/template-compare-drawer";
 import { useCartStore } from "@/lib/store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { CodeModal, type CodeModalItem } from "@/components/code-modal";
+import { PayPalCheckoutModal } from "@/components/paypal-checkout-modal";
 import {
   AccentPill,
   EASE,
@@ -19,8 +20,7 @@ import {
 } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import {
-  CHECKOUT_URL,
-  TEMPLATES,
+    TEMPLATES,
   TIER_COUNTS,
   type TemplateItem,
   type TemplateTier,
@@ -89,6 +89,7 @@ export function GallerySection() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
+  const [paypalTemplate, setPaypalTemplate] = useState<TemplateItem | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -243,14 +244,14 @@ export function GallerySection() {
               <p className="text-3xl font-black text-white leading-tight drop-shadow-lg">{item.name}</p>
             </div>
             {/* Hover overlay inside the modal picture */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm cursor-pointer" onClick={() => window.open(CHECKOUT_URL, "_blank")}>
+            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm cursor-pointer" onClick={() => window.open(`/preview/${item.id}`, "_blank")}>
               <div className="flex items-center gap-2 px-8 py-3 rounded-full bg-white text-black font-bold text-base shadow-2xl transition-transform transform hover:scale-105">
                 <Eye className="size-5" />
                 Live Demo
               </div>
             </div>
           </div>
-          <button onClick={() => window.open(CHECKOUT_URL, "_blank")} className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-colors px-10 py-3 font-semibold text-white">
+          <button onClick={() => window.open(`/preview/${item.id}`, "_blank")} className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-colors px-10 py-3 font-semibold text-white">
             <ExternalLink className="size-4" />
             Open Live Demo
           </button>
@@ -284,7 +285,7 @@ export function GallerySection() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } else {
-      window.open(CHECKOUT_URL, "_blank", "noopener,noreferrer");
+      setPaypalTemplate(item);
     }
   };
 
@@ -695,6 +696,14 @@ export function GallerySection() {
 
       {/* Code Modal */}
       <CodeModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+
+      {paypalTemplate && (
+        <PayPalCheckoutModal
+          template={paypalTemplate}
+          isOpen={!!paypalTemplate}
+          onClose={() => setPaypalTemplate(null)}
+        />
+      )}
     </SectionShell>
   );
 }

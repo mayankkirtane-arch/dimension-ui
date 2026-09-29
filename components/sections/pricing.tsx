@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { useSmoothScroll } from "@/lib/hooks";
-import { CHECKOUT_URL, PRICING } from "@/lib/site";
+import { PRICING } from "@/lib/site";
 
 /* ------------------------------------------------------------------ */
 /*  Assurance strip                                                   */
@@ -145,14 +145,8 @@ export function PricingSection() {
 
               {/* CTA */}
               <a
-                href={CHECKOUT_URL}
-                target={CHECKOUT_URL.startsWith("http") ? "_blank" : undefined}
-                rel={CHECKOUT_URL.startsWith("http") ? "noopener noreferrer" : undefined}
-                onClick={(e) => {
-                  if (!CHECKOUT_URL.startsWith("http")) {
-                    smoothScroll(e, CHECKOUT_URL);
-                  }
-                }}
+                href="#gallery"
+                onClick={(e) => smoothScroll(e, "#gallery")}
                 className="group/cta relative mt-7 inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-6 py-3.5 text-[0.9375rem] font-semibold text-white transition-transform duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.985]"
               >
                 <span

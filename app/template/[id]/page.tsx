@@ -5,7 +5,6 @@
  */
 import {
   TEMPLATES,
-  CHECKOUT_URL,
   getTemplateVersion,
   getTemplateLastUpdated,
   getTemplateChangelog,

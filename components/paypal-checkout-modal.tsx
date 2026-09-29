@@ -203,16 +203,16 @@ export function PayPalCheckoutModal({
                   <div className="inline-flex size-10 items-center justify-center rounded-xl bg-purple-500/20 text-purple-400 mb-2">
                     <Lock className="size-5" />
                   </div>
-                  <h4 className="text-sm font-bold text-white mb-1">Sign In Required</h4>
+                  <h4 className="text-sm font-bold text-white mb-1">Sign In / Sign Up Required</h4>
                   <p className="text-xs text-white/70 mb-4 max-w-xs mx-auto">
-                    Please sign in so your purchase and license can be linked to your account vault.
+                    Please sign in or create an account so your purchase and license can be linked to your account vault.
                   </p>
                   <Link
                     href={`/login`}
                     className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 px-5 py-2.5 text-xs font-bold text-white shadow-lg hover:brightness-110 transition-all"
                   >
                     <LogIn className="size-3.5" />
-                    Sign In with Magic Link
+                    Sign In / Sign Up with Magic Link
                   </Link>
                 </div>
               )}

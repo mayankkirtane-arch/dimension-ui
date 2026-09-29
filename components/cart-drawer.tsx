@@ -8,8 +8,7 @@
  */
 import { useState } from "react";
 import { useCartStore, getCartTotals } from "@/lib/store";
-import type { TemplateItem } from "@/lib/site";
-import { CHECKOUT_URL, TEMPLATES } from "@/lib/site";
+import { type TemplateItem, TEMPLATES } from "@/lib/site";
 import { validateCoupon } from "@/lib/coupons";
 import { X, ShoppingCart, Trash2, Tag, Zap, Ticket, CheckCircle, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,10 +50,10 @@ export function CartDrawer() {
   };
 
   const handleCheckout = () => {
-    const params = new URLSearchParams();
-    items.forEach((item) => params.append("item", item.id));
-    if (couponApplied && couponLabel) params.set("coupon", couponLabel);
-    window.open(`${CHECKOUT_URL}?${params.toString()}`, "_blank", "noopener,noreferrer");
+    if (paidItems.length > 0) {
+      const fullTemplate = TEMPLATES.find((t) => t.id === paidItems[0].id);
+      if (fullTemplate) setPaypalTemplate(fullTemplate);
+    }
   };
 
   return (
@@ -246,23 +245,13 @@ export function CartDrawer() {
 
                 {paidItems.length > 0 && (
                   <button
-                    onClick={() => {
-                      const fullTemplate = TEMPLATES.find((t) => t.id === paidItems[0].id);
-                      if (fullTemplate) setPaypalTemplate(fullTemplate);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#ffc439] hover:bg-[#f4b628] py-3 text-sm font-bold text-[#003087] shadow-lg transition-all"
+                    onClick={handleCheckout}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#ffc439] hover:bg-[#f4b628] py-3.5 text-sm font-bold text-[#003087] shadow-lg transition-all"
                   >
-                    <span className="italic font-black text-sm">PayPal</span>
-                    <span>Sandbox Checkout ({paidItems[0].name})</span>
+                    <span className="italic font-black text-base">PayPal</span>
+                    <span>Sandbox Checkout — ${finalTotal.toFixed(2)}</span>
                   </button>
                 )}
-
-                <button
-                  onClick={handleCheckout}
-                  className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 py-3.5 text-sm font-bold text-white shadow-lg hover:brightness-110 transition-all"
-                >
-                  Checkout — ${finalTotal.toFixed(2)}
-                </button>
 
                 <button
                   onClick={clearCart}
