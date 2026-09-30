@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { MessageSquarePlus, X, CheckCircle, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,6 +12,16 @@ export function TemplateRequestModal() {
   const [category, setCategory] = useState("SaaS");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +68,9 @@ export function TemplateRequestModal() {
             />
 
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Request a Custom Template"
               initial={{ scale: 0.95, opacity: 0, y: 15 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
@@ -64,7 +78,8 @@ export function TemplateRequestModal() {
             >
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute right-4 top-4 rounded-lg p-1.5 text-white/50 hover:bg-white/10 hover:text-white"
+                aria-label="Close template request modal"
+                className="absolute right-4 top-4 rounded-lg p-1.5 text-white/50 hover:bg-white/10 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400"
               >
                 <X className="size-4" />
               </button>
@@ -136,6 +151,14 @@ export function TemplateRequestModal() {
                       {loading ? "Submitting..." : "Submit Template Request"}
                       <Send className="size-4" />
                     </button>
+
+                    <p className="mt-2 text-center text-[10px] text-white/40">
+                      Your email is only used to notify you when your template is released. See our{" "}
+                      <Link href="/privacy" onClick={() => setIsOpen(false)} className="text-purple-400 hover:underline">
+                        Privacy Policy
+                      </Link>
+                      .
+                    </p>
                   </form>
                 </>
               )}

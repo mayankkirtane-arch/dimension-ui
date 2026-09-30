@@ -74,6 +74,16 @@ export function TemplateCompareDrawer() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, setOpen]);
+
   const templates = mounted
     ? (selectedIds
         .map((id) => TEMPLATES.find((t) => t.id === id))

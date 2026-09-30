@@ -5,6 +5,7 @@
  * Simple email form that saves to localStorage and shows a toast confirmation.
  */
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, CheckCircle, ArrowRight } from "lucide-react";
 
@@ -83,6 +84,16 @@ export function NewsletterCapture() {
             </motion.form>
           )}
         </AnimatePresence>
+
+        {!submitted && !alreadySignedUp && (
+          <p className="mt-3 text-[11px] text-white/40">
+            Zero spam. Unsubscribe anytime. View our{" "}
+            <Link href="/privacy" className="text-purple-400 hover:underline">
+              Privacy Policy
+            </Link>
+            .
+          </p>
+        )}
       </div>
     </div>
   );

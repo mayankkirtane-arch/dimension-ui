@@ -156,6 +156,22 @@ export default function LoginPage() {
                   <ArrowRight className="size-4" />
                 </button>
               </form>
+
+              <p className="mt-4 text-center text-[11px] text-white/40 leading-relaxed">
+                By continuing, you agree to our{" "}
+                <Link href="/terms" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">
+                  Terms
+                </Link>
+                ,{" "}
+                <Link href="/privacy" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">
+                  Privacy Policy
+                </Link>
+                , and{" "}
+                <Link href="/refund" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">
+                  Refund Policy
+                </Link>
+                .
+              </p>
             </>
           )}
         </div>

@@ -381,11 +381,13 @@ export const FOOTER = {
       ],
     },
     {
-      title: "Support",
+      title: "Legal & Support",
       links: [
-        { label: "Licence terms", href: "#faq" },
-        { label: "Refund policy", href: "#faq" },
-        { label: "Contact", href: "#faq" },
+        { label: "Terms & Conditions", href: "/terms" },
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Refund Policy", href: "/refund" },
+        { label: "Cookie Policy", href: "/cookies" },
+        { label: "Contact & FAQ", href: "#faq" },
       ],
     },
   ],

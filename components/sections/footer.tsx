@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUp, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
 import { CtaButton } from "@/components/navbar";
@@ -55,7 +56,7 @@ function FinalCta() {
 
           <p className="mt-4 inline-flex items-center gap-1.5 text-[0.75rem] text-ink-faint">
             <Sparkles className="size-3 text-neon-purple-bright" />
-            Instant download · Lifetime updates · 14-day refund
+            Instant download · Lifetime updates · Flexible refund policy
           </p>
         </div>
       </div>
@@ -110,13 +111,22 @@ export function SiteFooter() {
               <ul className="mt-4 flex flex-col gap-2.5">
                 {col.links.map((link) => (
                   <li key={`${col.title}-${link.label}`}>
-                    <a
-                      href={link.href}
-                      onClick={(e) => smoothScroll(e, link.href)}
-                      className="text-[0.8125rem] text-ink-dim transition-colors duration-300 hover:text-ink"
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith("#") ? (
+                      <a
+                        href={link.href}
+                        onClick={(e) => smoothScroll(e, link.href)}
+                        className="text-[0.8125rem] text-ink-dim transition-colors duration-300 hover:text-ink focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400 rounded"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-[0.8125rem] text-ink-dim transition-colors duration-300 hover:text-ink focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400 rounded"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

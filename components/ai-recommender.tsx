@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, X, Send, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TEMPLATES, type TemplateItem } from "@/lib/site";
@@ -24,6 +24,16 @@ export function AiRecommender() {
   ]);
   const [loading, setLoading] = useState(false);
   const { addItem } = useCartStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +98,9 @@ export function AiRecommender() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="AI Template Matcher"
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -106,7 +119,8 @@ export function AiRecommender() {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="rounded-lg p-1 text-white/50 hover:bg-white/10 hover:text-white"
+                aria-label="Close AI template matcher"
+                className="rounded-lg p-1 text-white/50 hover:bg-white/10 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400"
               >
                 <X className="size-4" />
               </button>

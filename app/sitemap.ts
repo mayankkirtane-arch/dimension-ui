@@ -12,6 +12,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/blog/3d-websites-convert-better`, lastModified: new Date('2026-09-12'), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${base}/blog/best-saas-templates-2026`, lastModified: new Date('2026-09-05'), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${base}/blog/tailwind-framer-motion-animations`, lastModified: new Date('2026-08-28'), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${base}/privacy`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${base}/terms`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${base}/cookies`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${base}/refund`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ];
 
   const templatePages: MetadataRoute.Sitemap = TEMPLATES.map((t) => ({

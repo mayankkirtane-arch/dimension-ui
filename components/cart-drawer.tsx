@@ -6,7 +6,8 @@
  * A sleek sliding panel showing cart items.
  * Features: bundle discount, coupon codes, totals.
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useCartStore, getCartTotals } from "@/lib/store";
 import { type TemplateItem, TEMPLATES } from "@/lib/site";
 import { validateCoupon } from "@/lib/coupons";
@@ -49,6 +50,16 @@ export function CartDrawer() {
     setCouponInput("");
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen && !paypalTemplate) {
+        closeCart();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, paypalTemplate, closeCart]);
+
   const handleCheckout = () => {
     if (paidItems.length > 0) {
       const fullTemplate = TEMPLATES.find((t) => t.id === paidItems[0].id);
@@ -77,6 +88,9 @@ export function CartDrawer() {
         {isOpen && (
           <motion.div
             key="drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Shopping Cart"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -96,7 +110,8 @@ export function CartDrawer() {
               </div>
               <button
                 onClick={closeCart}
-                className="rounded-lg border border-white/10 p-1.5 text-white/60 hover:text-white transition-colors"
+                aria-label="Close cart drawer"
+                className="rounded-lg border border-white/10 p-1.5 text-white/60 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400"
               >
                 <X className="size-4" />
               </button>
@@ -161,7 +176,8 @@ export function CartDrawer() {
                           </span>
                           <button
                             onClick={() => removeItem(item.id)}
-                            className="text-white/30 hover:text-red-400 transition-colors"
+                            aria-label={`Remove ${item.name} from cart`}
+                            className="text-white/30 hover:text-red-400 transition-colors p-1 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
                           >
                             <Trash2 className="size-3.5" />
                           </button>
@@ -244,13 +260,26 @@ export function CartDrawer() {
                 </div>
 
                 {paidItems.length > 0 && (
-                  <button
-                    onClick={handleCheckout}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#ffc439] hover:bg-[#f4b628] py-3.5 text-sm font-bold text-[#003087] shadow-lg transition-all"
-                  >
-                    <span className="italic font-black text-base">PayPal</span>
-                    <span>Sandbox Checkout — ${finalTotal.toFixed(2)}</span>
-                  </button>
+                  <>
+                    <p className="text-[10px] text-center text-white/40 leading-relaxed">
+                      By proceeding, you agree to our{" "}
+                      <Link href="/terms" onClick={closeCart} className="text-cyan-400 hover:underline">
+                        Terms
+                      </Link>{" "}
+                      &amp;{" "}
+                      <Link href="/refund" onClick={closeCart} className="text-cyan-400 hover:underline">
+                        Refund Policy
+                      </Link>
+                      .
+                    </p>
+                    <button
+                      onClick={handleCheckout}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#ffc439] hover:bg-[#f4b628] py-3.5 text-sm font-bold text-[#003087] shadow-lg transition-all"
+                    >
+                      <span className="italic font-black text-base">PayPal</span>
+                      <span>Sandbox Checkout — ${finalTotal.toFixed(2)}</span>
+                    </button>
+                  </>
                 )}
 
                 <button

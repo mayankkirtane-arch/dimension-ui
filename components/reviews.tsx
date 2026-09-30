@@ -18,18 +18,6 @@ interface Review {
   helpful: number;
 }
 
-// Seeded reviews for social proof (real reviews will come via Supabase later)
-function getSeedReviews(templateId: string): Review[] {
-  const seeds: Review[] = [
-    { id: "r1", name: "Alex M.", rating: 5, comment: "Absolutely stunning template. Saved me 3 weeks of work. The 3D animations are silky smooth.", date: "2026-09-10", helpful: 24 },
-    { id: "r2", name: "Priya K.", rating: 5, comment: "Exactly what I needed for my SaaS product. Clean code, easy to customize. Worth every penny.", date: "2026-09-08", helpful: 18 },
-    { id: "r3", name: "James T.", rating: 4, comment: "Really impressive design. Would love a dark/light toggle but otherwise perfect.", date: "2026-09-05", helpful: 11 },
-  ];
-  // Use templateId to vary which reviews show (consistent per template)
-  const hash = templateId.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return seeds.slice(0, (hash % 2) + 2);
-}
-
 function StarRating({ value, onChange, readonly }: { value: number; onChange?: (v: number) => void; readonly?: boolean }) {
   const [hovered, setHovered] = useState(0);
   return (
@@ -39,10 +27,11 @@ function StarRating({ value, onChange, readonly }: { value: number; onChange?: (
           key={star}
           type="button"
           disabled={readonly}
+          aria-label={readonly ? `${value} out of 5 stars` : `Rate ${star} out of 5 stars`}
           onClick={() => onChange?.(star)}
           onMouseEnter={() => !readonly && setHovered(star)}
           onMouseLeave={() => setHovered(0)}
-          className={readonly ? "cursor-default" : "cursor-pointer"}
+          className={readonly ? "cursor-default" : "cursor-pointer p-0.5 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400"}
         >
           <Star
             className={`size-4 transition-colors ${
@@ -66,9 +55,14 @@ export function ReviewsSection({ templateId }: { templateId: string }) {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    const seed = getSeedReviews(templateId);
-    const stored = JSON.parse(localStorage.getItem(`reviews_${templateId}`) ?? "[]");
-    setReviews([...stored, ...seed]);
+    try {
+      const stored = JSON.parse(localStorage.getItem(`reviews_${templateId}`) ?? "[]");
+      if (Array.isArray(stored)) {
+        setReviews(stored);
+      }
+    } catch {
+      setReviews([]);
+    }
   }, [templateId]);
 
   const avgRating = reviews.length
@@ -77,18 +71,23 @@ export function ReviewsSection({ templateId }: { templateId: string }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!comment.trim()) return;
     const newReview: Review = {
       id: Date.now().toString(),
-      name: name || "Anonymous",
+      name: name.trim() || "Verified Visitor",
       rating,
-      comment,
+      comment: comment.trim(),
       date: new Date().toISOString().split("T")[0],
       helpful: 0,
     };
-    const stored = JSON.parse(localStorage.getItem(`reviews_${templateId}`) ?? "[]");
-    stored.unshift(newReview);
-    localStorage.setItem(`reviews_${templateId}`, JSON.stringify(stored));
-    setReviews([newReview, ...reviews]);
+    try {
+      const stored = JSON.parse(localStorage.getItem(`reviews_${templateId}`) ?? "[]");
+      const updated = [newReview, ...(Array.isArray(stored) ? stored : [])];
+      localStorage.setItem(`reviews_${templateId}`, JSON.stringify(updated));
+      setReviews(updated);
+    } catch {
+      setReviews([newReview, ...reviews]);
+    }
     setSubmitted(true);
     setShowForm(false);
     setName("");
@@ -105,31 +104,38 @@ export function ReviewsSection({ templateId }: { templateId: string }) {
           <h3 className="text-lg font-bold text-white">Customer Reviews</h3>
           <span className="text-sm text-white/40">({reviews.length})</span>
         </div>
-        <div className="flex items-center gap-2">
-          <StarRating value={Math.round(avgRating)} readonly />
-          <span className="text-sm font-bold text-white">{avgRating.toFixed(1)}</span>
-        </div>
+        {reviews.length > 0 && (
+          <div className="flex items-center gap-2">
+            <StarRating value={Math.round(avgRating)} readonly />
+            <span className="text-sm font-bold text-white">{avgRating.toFixed(1)}</span>
+          </div>
+        )}
       </div>
 
       {/* Review list */}
-      <div className="flex flex-col gap-4 mb-6">
-        {reviews.map((r) => (
-          <div key={r.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <span className="text-sm font-bold text-white">{r.name}</span>
-                <span className="ml-2 text-xs text-white/40">{r.date}</span>
+      {reviews.length === 0 ? (
+        <div className="rounded-xl border border-white/5 bg-white/[0.01] p-6 text-center text-sm text-white/50 mb-6">
+          <p>No customer reviews submitted yet.</p>
+          <p className="text-xs text-white/30 mt-1">
+            Have you built with this template? Share your experience with the community below.
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4 mb-6">
+          {reviews.map((r) => (
+            <div key={r.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <span className="text-sm font-bold text-white">{r.name}</span>
+                  <span className="ml-2 text-xs text-white/40">{r.date}</span>
+                </div>
+                <StarRating value={r.rating} readonly />
               </div>
-              <StarRating value={r.rating} readonly />
+              <p className="text-sm text-white/70 leading-relaxed">{r.comment}</p>
             </div>
-            <p className="text-sm text-white/70 leading-relaxed">{r.comment}</p>
-            <div className="mt-2 flex items-center gap-1 text-xs text-white/30">
-              <ThumbsUp className="size-3" />
-              <span>{r.helpful} found this helpful</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Write a review */}
       {submitted && !showForm && (

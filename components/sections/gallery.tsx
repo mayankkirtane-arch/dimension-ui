@@ -577,7 +577,7 @@ export function GallerySection() {
                       <div className="absolute inset-0">
                         <img
                           src={`https://images.unsplash.com/photo-${PHOTOS[item.id].src}?w=600&q=80&auto=format&fit=crop`}
-                          alt=""
+                          alt={`${item.name} template preview thumbnail`}
                           className="absolute inset-0 w-full h-full object-cover"
                           loading="lazy"
                         />

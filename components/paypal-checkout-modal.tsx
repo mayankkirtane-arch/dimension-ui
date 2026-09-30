@@ -58,7 +58,15 @@ export function PayPalCheckoutModal({
       setUser(res?.data?.user || null);
       setCheckingAuth(false);
     });
-  }, [isOpen]);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && step !== "capturing") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, step, onClose]);
 
   const handleCreateAndPay = async () => {
     if (!user) return;
@@ -155,7 +163,8 @@ export function PayPalCheckoutModal({
               {step !== "capturing" && (
                 <button
                   onClick={onClose}
-                  className="rounded-lg p-1 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                  aria-label="Close checkout modal"
+                  className="rounded-lg p-1 text-white/40 hover:text-white hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400"
                 >
                   <X className="size-4" />
                 </button>
@@ -259,6 +268,18 @@ export function PayPalCheckoutModal({
                       Cancel checkout
                     </button>
                   </div>
+
+                  <p className="text-[10px] text-center text-white/40 leading-relaxed">
+                    By confirming this order, you agree to our{" "}
+                    <Link href="/terms" target="_blank" className="text-cyan-400 hover:underline">
+                      Terms
+                    </Link>{" "}
+                    &amp;{" "}
+                    <Link href="/refund" target="_blank" className="text-cyan-400 hover:underline">
+                      Refund Policy
+                    </Link>
+                    .
+                  </p>
 
                   <p className="text-[11px] text-center text-white/40">
                     🔒 Sandbox simulation mode. Zero real currency will be charged.
