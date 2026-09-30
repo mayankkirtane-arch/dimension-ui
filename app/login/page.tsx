@@ -18,6 +18,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Check for error parameters in URL on mount
+  useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlError = params.get("error");
+      if (urlError) {
+        setError(urlError);
+      }
+    }
+  });
+
   const supabase = createClient();
 
   const handleMagicLink = async (e: React.FormEvent) => {
@@ -26,7 +37,7 @@ export default function LoginPage() {
     setError(null);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
     });
     if (error) {
       setError(error.message);
@@ -37,10 +48,24 @@ export default function LoginPage() {
   };
 
   const handleGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
+    setError(null);
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+      },
     });
+    if (error) {
+      if (error.message.toLowerCase().includes("not enabled")) {
+        setError(
+          "Google sign-in is not yet enabled in your Supabase project dashboard. Please sign in using the Email Magic Link below, or enable the Google provider in Supabase Authentication settings."
+        );
+      } else {
+        setError(error.message);
+      }
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,6 +99,12 @@ export default function LoginPage() {
             <>
               <h1 className="text-2xl font-bold text-white mb-1">Welcome back</h1>
               <p className="text-white/50 text-sm mb-6">Sign in to access your purchased templates.</p>
+
+              {error && (
+                <div className="p-3 mb-4 rounded-xl border border-red-500/20 bg-red-500/10 text-xs text-red-300 leading-relaxed">
+                  {error}
+                </div>
+              )}
 
               {/* Google OAuth */}
               <button
